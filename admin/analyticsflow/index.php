@@ -1,4 +1,4 @@
-<button class="button" onclick="toggleChart()">Show Purchase Chart</button>
+<button class="button" onclick="toggleChart()">Show Quantity Flow Chart</button>
 
 <div id="chart-container" style="display:none;">
     <canvas id="myChart"></canvas>
@@ -28,12 +28,12 @@
 
         var ctx = document.getElementById('myChart').getContext('2d');
         var myChart = new Chart(ctx, {
-            type: 'line',
+            type: 'radar',
             data: {
                 labels: <?php echo json_encode(array_column($purchase_data, 'item_id')); ?>,
                 datasets: [
                     {
-                        label: 'Total Quantity Purchased',
+                        label: 'Total Quantity Flow',
                         data: <?php echo json_encode(array_column($purchase_data, 'total_quantity')); ?>,
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
                         borderColor: 'rgba(255, 99, 132, 1)',
@@ -59,7 +59,7 @@
                 },
                 title: {
                     display: true,
-                    text: 'Purchase Chart (Quantity)',
+                    text: 'Quantity flow',
                     fontColor: 'black',
                     fontSize: 20
                 },

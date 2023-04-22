@@ -118,6 +118,14 @@
                       </a>
                     </li>
 
+                    <li class="nav-item ">
+                      <a href="<?php echo base_url ?>admin/?page=analyticsflow" class="nav-link nav-analyticsflow">
+                        <i class="nav-icon fas fa-thumbtack"></i>
+                        <p>
+                          Quantity Flow
+                        </p>
+                      </a>
+                    </li>
 
 
                     
