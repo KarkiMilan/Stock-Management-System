@@ -117,6 +117,173 @@ var myChart = new Chart(ctx, {
     myChart.canvas.parentNode.style.height = '400px';
 }
 </script>
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+    display: none;
+  }
+  thead {
+    background-color: #f7f7f7;
+  }
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  th {
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  tbody tr:hover {
+    background-color: #ddd;
+  }
+  .show-table {
+    display: block;
+  }
+  #sales-data-suggestions {
+    max-width: 800px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+  }
+  #sales-data-suggestions p {
+    margin: 10px 0;
+  }
+  #sales-data-suggestions p strong {
+    font-weight: bold;
+  }
+</style>
+<button id="toggle-table-btn">Show Sales Data</button>
+<table id="sales-data-table">
+  <thead>
+    <tr>
+      <th>Client</th>
+      <th>Total Sales This Month</th>
+      <th>Total Sales This Year</th>
+      <th>Total Sales All Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php
+    foreach ($sales_data_all_time as $data) {
+      $client = $data['client'];
+      $total_sales_this_month = 0;
+      $total_sales_this_year = 0;
+      $total_sales_all_time = $data['total_sales'];
+      foreach ($sales_data_this_month as $d) {
+        if ($d['client'] === $client) {
+          $total_sales_this_month = $d['total_sales'];
+          break;
+        }
+      }
+      foreach ($sales_data_this_year as $d) {
+        if ($d['client'] === $client) {
+          $total_sales_this_year = $d['total_sales'];
+          break;
+        }
+      }
+      ?>
+      <tr>
+        <td><?php echo $client; ?></td>
+        <td><?php echo number_format($total_sales_this_month, 2); ?></td>
+        <td><?php echo number_format($total_sales_this_year, 2); ?></td>
+        <td><?php echo number_format($total_sales_all_time, 2); ?></td>
+      </tr>
+      <?php
+    }
+    ?>
+  </tbody>
+  
+</table>
+<div id="sales-data-suggestions">
+  <p><strong>Sales Suggestions:</strong></p>
+  <?php
+  $max_sales_this_year = 0;
+  $max_sales_all_time = 0;
+  $min_sales_this_year = PHP_INT_MAX;
+  $min_sales_all_time = PHP_INT_MAX;
+  $total_sales = 0;
+  foreach ($sales_data_all_time as $data) {
+    $total_sales += $data['total_sales'];
+    $total_sales_this_year = 0;
+    $total_sales_all_time = $data['total_sales'];
+    foreach ($sales_data_this_year as $d) {
+      if ($d['client'] === $data['client']) {
+        $total_sales_this_year = $d['total_sales'];
+        break;
+      }
+    }
+    // check if current client has the highest sales this year
+    if ($total_sales_this_year > $max_sales_this_year) {
+      $max_sales_this_year = $total_sales_this_year;
+      $max_sales_this_year_client = $data['client'];
+    }
+    // check if current client has the highest sales all time
+    if ($total_sales_all_time > $max_sales_all_time) {
+      $max_sales_all_time = $total_sales_all_time;
+      $max_sales_all_time_client = $data['client'];
+    }
+    // check if current client has the lowest sales this year
+    if ($total_sales_this_year < $min_sales_this_year) {
+      $min_sales_this_year = $total_sales_this_year;
+      $min_sales_this_year_client = $data['client'];
+    }
+    // check if current client has the lowest sales all time
+    if ($total_sales_all_time < $min_sales_all_time) {
+      $min_sales_all_time = $total_sales_all_time;
+      $min_sales_all_time_client = $data['client'];
+    }
+  }
+  $middle_sales_person = '';
+  $middle_sales_diff = PHP_INT_MAX;
+  foreach ($sales_data_all_time as $data) {
+    $total_sales_this_year = 0;
+    $total_sales_all_time = $data['total_sales'];
+    foreach ($sales_data_this_year as $d) {
+      if ($d['client'] === $data['client']) {
+        $total_sales_this_year = $d['total_sales'];
+        break;
+      }
+    }
+    $diff = abs($total_sales_all_time - ($total_sales/2));
+    if ($diff < $middle_sales_diff) {
+      $middle_sales_diff = $diff;
+      $middle_sales_person = $data['client'];
+      $middle_sales_total = $total_sales_all_time;
+    }
+  }
+  ?>
+  <p><?php echo $max_sales_this_year_client; ?> has the highest sales this year with <?php echo number_format($max_sales_this_year, 2); ?> in total sales.</p>
+  <p><?php echo $max_sales_all_time_client; ?> has the highest sales of all time with <?php echo number_format($max_sales_all_time, 2); ?> in total sales.</p>
+  <p><?php echo $min_sales_this_year_client; ?> has the lowest sales this year with <?php echo number_format($min_sales_this_year, 2); ?> in total sales.</p>
+  <p><?php echo $min_sales_all_time_client; ?> has the lowest sales of all time with <?php echo number_format($min_sales_all_time, 2); ?> in total sales.</p>
+<p>To catch up to <?php echo $max_sales_this_year_client; ?>, <?php echo $min_sales_this_year_client; ?> needs to increase their sales by <?php echo number_format($max_sales_this_year - $min_sales_this_year, 2); ?> this year.</p>
+<p>To catch up to <?php echo $max_sales_all_time_client; ?>, <?php echo $min_sales_all_time_client; ?> needs to increase their sales by <?php echo number_format($max_sales_all_time - $min_sales_all_time, 2); ?> in total sales.</p>
+<p>The person who has sold closest to the median amount of <?php echo number_format($total_sales/2, 2); ?> in total sales is <?php echo $middle_sales_person; ?>, with <?php echo number_format($middle_sales_total, 2); ?> in total sales.</p>
 
+  <p><strong>Sales Summary:</strong></p>
+  <ul>
+    <?php foreach ($sales_data_all_time as $data): ?>
+      <li><?php echo $data['client']; ?>: <?php echo number_format($data['total_sales'], 2); ?></li>
+    <?php endforeach; ?>
+  </ul>
 
-
+  
+</div>
+<script>
+const toggleTableBtn = document.getElementById('toggle-table-btn');
+const salesDataTable = document.getElementById('sales-data-table');
+toggleTableBtn.addEventListener('click', function() {
+  salesDataTable.classList.toggle('show-table');
+});
+</script>
