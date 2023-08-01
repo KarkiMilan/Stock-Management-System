@@ -45,16 +45,7 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 						<option value="2"> <?php echo isset($type) && $type == 2 ? 'selected': '' ?>Staff</option>
 					</select>
 				</div>
-				<div class="form-group col-6">
-					<label for="" class="control-label">Avatar</label>
-					<div class="custom-file">
-		              <input type="file" class="custom-file-input rounded-circle" id="customFile" name="img" onchange="displayImg(this,$(this))">
-		              <label class="custom-file-label" for="customFile">Choose file</label>
-		            </div>
-				</div>
-				<div class="form-group col-6 d-flex justify-content-center">
-					<img src="<?php echo validate_image(isset($meta['avatar']) ? $meta['avatar'] :'') ?>" alt="" id="cimg" class="img-fluid img-thumbnail">
-				</div>
+				
 			</form>
 		</div>
 	</div>

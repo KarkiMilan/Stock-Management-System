@@ -32,16 +32,7 @@ foreach($user->fetch_array() as $k =>$v){
 					<input type="password" name="password" id="password" class="form-control" value="" autocomplete="off">
 					<small><i>Leave this blank if you dont want to change the password.</i></small>
 				</div>
-				<div class="form-group">
-					<label for="" class="control-label">Avatar</label>
-					<div class="custom-file">
-		              <input type="file" class="custom-file-input rounded-circle" id="customFile" name="img" onchange="displayImg(this,$(this))">
-		              <label class="custom-file-label" for="customFile">Choose file</label>
-		            </div>
-				</div>
-				<div class="form-group d-flex justify-content-center">
-					<img src="<?php echo validate_image(isset($meta['avatar']) ? $meta['avatar'] :'') ?>" alt="" id="cimg" class="img-fluid img-thumbnail">
-				</div>
+				
 			</form>
 		</div>
 	</div>
