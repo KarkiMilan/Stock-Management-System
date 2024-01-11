@@ -267,9 +267,9 @@ var myChart = new Chart(ctx, {
   <p><?php echo $max_sales_all_time_client; ?> has the highest sales of all time with <?php echo number_format($max_sales_all_time, 2); ?> in total sales.</p>
   <p><?php echo $min_sales_this_year_client; ?> has the lowest sales this year with <?php echo number_format($min_sales_this_year, 2); ?> in total sales.</p>
   <p><?php echo $min_sales_all_time_client; ?> has the lowest sales of all time with <?php echo number_format($min_sales_all_time, 2); ?> in total sales.</p>
-<p>To catch up to <?php echo $max_sales_this_year_client; ?>, <?php echo $min_sales_this_year_client; ?> needs to increase their sales by <?php echo number_format($max_sales_this_year - $min_sales_this_year, 2); ?> this year.</p>
-<p>To catch up to <?php echo $max_sales_all_time_client; ?>, <?php echo $min_sales_all_time_client; ?> needs to increase their sales by <?php echo number_format($max_sales_all_time - $min_sales_all_time, 2); ?> in total sales.</p>
-<p>The person who has sold closest to the median amount of <?php echo number_format($total_sales/2, 2); ?> in total sales is <?php echo $middle_sales_person; ?>, with <?php echo number_format($middle_sales_total, 2); ?> in total sales.</p>
+<p>Rule 1 : To catch up to <?php echo $max_sales_this_year_client; ?>, <?php echo $min_sales_this_year_client; ?> needs to increase their sales by <?php echo number_format($max_sales_this_year - $min_sales_this_year, 2); ?> this year.</p>
+<p>Rule 2 : To catch up to <?php echo $max_sales_all_time_client; ?>, <?php echo $min_sales_all_time_client; ?> needs to increase their sales by <?php echo number_format($max_sales_all_time - $min_sales_all_time, 2); ?> in total sales.</p>
+<p>Rule 3 : The person who has sold closest to the median amount of <?php echo number_format($total_sales/2, 2); ?> in total sales is <?php echo $middle_sales_person; ?>, with <?php echo number_format($middle_sales_total, 2); ?> in total sales.</p>
 
   <p><strong>Sales Summary:</strong></p>
   <ul>

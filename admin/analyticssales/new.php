@@ -172,15 +172,17 @@ $sales_summary = array(
 "all_time_low" => $all_time_low
 );
 
+// Rule-based suggestion generation
 $suggestion = "";
 if ($current_month_sales < $average_sales_all_time) {
-$suggestion = "Consider increasing your sales efforts to meet your demand.";
+$suggestion = "Rule 1 : Consider increasing your sales efforts to meet your demand.";
 } elseif ($current_month_sales > $current_year_sales) {
-$suggestion = "Consider decreasing your sales efforts to avoid overselling.";
+$suggestion = "Rule 2 : Consider decreasing your sales efforts to avoid overselling.";
 } else {
-$suggestion = "Your current sales level seems to be appropriate. Keep up the good work!";
+$suggestion = "Rule 3 : our current sales level seems to be appropriate. Keep up the good work!";
 }
 
+// Rule-based message generation
 $sales_message = "Your current monthly sales is " . number_format($current_month_sales, 2) . ".\n";
 $sales_message .= "Your average monthly sales is " . number_format($average_sales_all_time, 2) . ".\n";
 $sales_message .= "Your current yearly sales is " . number_format($current_year_sales, 2) . ".\n";

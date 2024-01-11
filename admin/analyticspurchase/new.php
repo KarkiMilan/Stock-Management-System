@@ -127,6 +127,7 @@ while ($row = $result_all_time->fetch_assoc()) {
 </script>
 
 <h3>Purchase Suggestions</h3>
+
 <?php
 
 $stmt = $conn->prepare("SELECT DATE(date_created) as purchase_date, SUM(amount) as total_purchase 
@@ -138,12 +139,12 @@ $result_all_time = $stmt->get_result();
 
 $purchase_data_all_time = array();
 while ($row = $result_all_time->fetch_assoc()) {
-$purchase_data_all_time[$row['purchase_date']] = $row['total_purchase'];
+    $purchase_data_all_time[$row['purchase_date']] = $row['total_purchase'];
 }
 
 // Calculate total purchase for all time
-$total_purchase_all_time = array_reduce($purchase_data_all_time, function($acc, $value) {
-return $acc + $value;
+$total_purchase_all_time = array_reduce($purchase_data_all_time, function ($acc, $value) {
+    return $acc + $value;
 });
 
 // Calculate all-time high and low purchases
@@ -161,30 +162,32 @@ $average_purchase_all_time = $total_purchase_all_time / count($purchase_data_all
 
 $current_year_purchase = 0;
 foreach ($purchase_data_all_time as $date => $purchase_amount) {
-if (substr($date, 0, 4) == substr($current_month_date, 0, 4)) {
-$current_year_purchase += $purchase_amount;
-} else {
-break;
-}
+    if (substr($date, 0, 4) == substr($current_month_date, 0, 4)) {
+        $current_year_purchase += $purchase_amount;
+    } else {
+        break;
+    }
 }
 
 $purchase_summary = array(
-"current_month_purchase" => $current_month_purchase,
-"average_purchase_all_time" => $average_purchase_all_time,
-"current_year_purchase" => $current_year_purchase,
-"all_time_high" => $all_time_high,
-"all_time_low" => $all_time_low
+    "current_month_purchase" => $current_month_purchase,
+    "average_purchase_all_time" => $average_purchase_all_time,
+    "current_year_purchase" => $current_year_purchase,
+    "all_time_high" => $all_time_high,
+    "all_time_low" => $all_time_low
 );
 
+// Rule-based suggestion generation
 $suggestion = "";
 if ($current_month_purchase < $average_purchase_all_time) {
-$suggestion = "Consider increasing your purchases to meet your demand.";
+    $suggestion = "Rule 1: Consider increasing your purchases to meet your demand.";
 } elseif ($current_month_purchase > $current_year_purchase) {
-$suggestion = "Consider decreasing your purchases to avoid surplus inventory.";
+    $suggestion = "Rule 2: Consider decreasing your purchases to avoid surplus inventory.";
 } else {
-$suggestion = "Your current purchase level seems to be appropriate. Keep up the good work!";
+    $suggestion = "Rule 3: Your current purchase level seems to be appropriate. Keep up the good work!";
 }
 
+// Rule-based message generation
 $purchase_message = "Your current monthly purchase is " . number_format($current_month_purchase, 2) . ".\n";
 $purchase_message .= "Your average monthly purchase is " . number_format($average_purchase_all_time, 2) . ".\n";
 $purchase_message .= "Your current yearly purchase is " . number_format($current_year_purchase, 2) . ".\n";
@@ -193,6 +196,6 @@ $purchase_message .= "Your all-time low purchase is " . number_format($all_time_
 $purchase_message .= "Your purchase amount for " . $all_time_high . " is high compared to historical data.\n";
 $purchase_message .= $suggestion;
 
-    echo "<div id='purchase-suggestion'>" . nl2br($purchase_message) . "</div>";
+echo "<div id='purchase-suggestion'>" . nl2br($purchase_message) . "</div>";
 
 ?>

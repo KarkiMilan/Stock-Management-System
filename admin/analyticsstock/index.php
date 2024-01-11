@@ -117,17 +117,17 @@
     var suggestionsList = document.getElementById('suggestions-list');
     suggestionsList.innerHTML = ''; // clear previous suggestions
 
-    // Add new suggestions
+    // Add Rule based suggestions
     var listItem1 = document.createElement('li');
-    listItem1.textContent = 'Consider reducing stock for ' + highestStockDate + ', which has the highest stock of ' + sortedData[0].quantity + ' items';
+    listItem1.textContent = 'Rule 1 : Consider reducing stock for ' + highestStockDate + ', which has the highest stock of ' + sortedData[0].quantity + ' items';
     suggestionsList.appendChild(listItem1);
 
     var listItem2 = document.createElement('li');
-    listItem2.textContent = 'Order more stock for ' + lowestStockDate + ', which has the lowest stock of ' + sortedData[sortedData.length - 1].quantity + ' items';
+    listItem2.textContent = 'Rule 2: Order more stock for ' + lowestStockDate + ', which has the lowest stock of ' + sortedData[sortedData.length - 1].quantity + ' items';
     suggestionsList.appendChild(listItem2);
 
     var listItem3 = document.createElement('li');
-    listItem3.textContent = 'Consider restocking ' + midStockDate + ', which has a mid-level stock of ' + sortedData[midStockIndex].quantity + ' items';
+    listItem3.textContent = 'Rule 3: Consider restocking ' + midStockDate + ', which has a mid-level stock of ' + sortedData[midStockIndex].quantity + ' items';
     suggestionsList.appendChild(listItem3);
 }
 
