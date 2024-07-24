@@ -1,5 +1,6 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <?php 
 $qry = $conn->query("SELECT p.*,s.name as supplier FROM purchase_order_list p inner join supplier_list s on p.supplier_id = s.id  where p.id = '{$_GET['id']}'");
 if($qry->num_rows >0){
@@ -104,7 +105,39 @@ if($qry->num_rows >0){
     
     <button class="btn btn-flat btn-secondary" type="button" id="pdf">PDF</button>
 <button class="btn btn-flat btn-success" type="button" id="excel">Excel</button>
+<!-- Button to trigger the modal -->
+<button class="btn btn-primary" type="button" id="emailButton" data-bs-toggle="modal" data-bs-target="#emailModal">
+        Send Email
+    </button>
 
+    <!-- Email Modal -->
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Send Test Email</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="emailForm">
+                        <div class="mb-3">
+                            <label for="recipientEmail" class="form-label">Recipient Email</label>
+                            <input type="email" class="form-control" id="recipientEmail" name="recipientEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="emailSubject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="emailSubject" name="emailSubject" value="Purchase Order Report" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="emailBody" class="form-label">Message</label>
+                            <textarea class="form-control" id="emailBody" name="emailBody" rows="3" required>Please Find The Attachment For The Purchase Order Report.</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Email</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
         <button class="btn btn-flat btn-danger" type="button" id="print">Print</button>
         <a class="btn btn-flat btn-primary" href="<?php echo base_url.'/admin?page=purchase_order/manage_po&id='.(isset($id) ? $id : '') ?>">Edit</a>
         <a class="btn btn-flat btn-dark" href="<?php echo base_url.'/admin?page=purchase_order' ?>">Back To List</a>
@@ -261,4 +294,47 @@ $(function(){
         end_loader()
     })
 })
-</script>
+
+      $(document).ready(function() {
+        $('#emailButton').click(function() {
+            $('#emailModal').modal('show');
+        });
+
+        $('#emailForm').submit(function(e) {
+            e.preventDefault();
+
+            // Get form data
+            var recipientEmail = $('#recipientEmail').val();
+            var emailSubject = $('#emailSubject').val();
+            var emailBody = $('#emailBody').val();
+
+            // Prepare form data
+            var formData = {
+                recipientEmail: recipientEmail,
+                emailSubject: emailSubject,
+                emailBody: emailBody
+            };
+
+            // Send data via AJAX
+            $.ajax({
+                url: '/sms/admin/purchase_order/send_mail.php',
+                method: 'POST',
+                data: formData,
+                dataType: 'json', // Expect JSON response
+                success: function(response) {
+                    console.log('Response from server:', response); // Log response for debugging
+                    if (response.success) {
+                        alert('Email sent successfully');
+                        $('#emailModal').modal('hide');
+                    } else {
+                        alert('Failed to send email: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to send email:', error);
+                    alert('Failed to send email. See console for details.');
+                }
+            });
+        });
+      });
+    </script>
