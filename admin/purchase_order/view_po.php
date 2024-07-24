@@ -1,6 +1,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <?php 
 $qry = $conn->query("SELECT p.*,s.name as supplier FROM purchase_order_list p inner join supplier_list s on p.supplier_id = s.id  where p.id = '{$_GET['id']}'");
 if($qry->num_rows >0){
@@ -119,21 +120,22 @@ if($qry->num_rows >0){
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="emailForm">
-                        <div class="mb-3">
-                            <label for="recipientEmail" class="form-label">Recipient Email</label>
-                            <input type="email" class="form-control" id="recipientEmail" name="recipientEmail" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="emailSubject" class="form-label">Subject</label>
-                            <input type="text" class="form-control" id="emailSubject" name="emailSubject" value="Purchase Order Report" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="emailBody" class="form-label">Message</label>
-                            <textarea class="form-control" id="emailBody" name="emailBody" rows="3" required>Please Find The Attachment For The Purchase Order Report.</textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Send Email</button>
-                    </form>
+                <form id="emailForm" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="recipientEmail" class="form-label">Recipient Email</label>
+        <input type="email" class="form-control" id="recipientEmail" name="recipientEmail" required>
+    </div>
+    <div class="mb-3">
+        <label for="emailSubject" class="form-label">Subject</label>
+        <input type="text" class="form-control" id="emailSubject" name="emailSubject" value="Purchase Order Report" required>
+    </div>
+    <div class="mb-3">
+        <label for="emailBody" class="form-label">Message</label>
+        <textarea class="form-control" id="emailBody" name="emailBody" rows="3" required>Please Find The Attachment For The Purchase Order Report</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Email</button>
+</form>
+
                 </div>
             </div>
         </div>
@@ -201,10 +203,8 @@ if($qry->num_rows >0){
                      }, 500);
         })
     })
-    
 
-
-$(function(){
+    $(function(){
     $('#pdf').click(function(){
         start_loader()
         var _el = $('<div>')
@@ -256,8 +256,90 @@ $(function(){
         end_loader()
     })
 })
+$(document).ready(function() {
+    $('#emailButton').click(function() {
+        $('#emailModal').modal('show');
+    });
 
+    $('#emailForm').submit(function(e) {
+        e.preventDefault();
 
+        // Start loader (for visual feedback)
+        start_loader();
+
+        // Generate the PDF content
+        var _el = $('<div>');
+        var p = $('#print_out').clone();
+        p.find('tr.text-light').removeClass("text-light bg-navy");
+        _el.append('<div class="d-flex justify-content-center">'+
+                  '<div class="col-1 text-right">'+
+                  '<img src="<?php echo validate_image($_settings->info('logo')) ?>" width="65px" height="65px" />'+
+                  '</div>'+
+                  '<div class="col-10">'+
+                  '<h2 class="text-center"><?php echo $_settings->info('name') ?></h2>'+
+                  '<h3 class="text-center">Purchase Order</h3>'+
+                  '</div>'+
+                  '<div class="col-1 text-right">'+
+                  '</div>'+
+                  '</div><hr/>');
+
+        _el.append(p.html());
+
+        // Ensure the HTML content is correctly available
+        var contentHtml = _el.html();
+        if (!contentHtml) {
+            console.error('No content to generate PDF.');
+            end_loader();
+            return;
+        }
+
+        var opt = {
+            margin: [0.5, 0.5, 0.5, 0.5],
+            filename: 'purchase_order.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(contentHtml).toPdf().get('pdf').then(function(pdf) {
+            var pdfOutput = pdf.output('blob');
+            var formData = new FormData($('#emailForm')[0]);
+            formData.append('pdf', pdfOutput, 'purchase_order.pdf');
+
+            // Debugging
+            console.log('FormData content:', ...formData.entries()); // Log FormData content
+
+            // Send data via AJAX
+            $.ajax({
+                url: '/sms/admin/purchase_order/send_mail.php',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Response from server:', response);
+                    if (response.success) {
+                        alert('Email sent successfully');
+                        $('#emailModal').modal('hide');
+                    } else {
+                        alert('Failed to send email: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to send email:', error);
+                    console.log('Response text:', xhr.responseText); // Log response text
+                    alert('Failed to send email. See console for details.');
+                }
+            }).always(function() {
+                end_loader(); // Stop loader regardless of success or failure
+            });
+        }).catch(function(err) {
+            console.error('Error generating PDF:', err);
+            end_loader(); // Ensure loader stops if there's an error
+        });
+    });
+});
 $(function(){
     $('#excel').click(function(){
         start_loader()
@@ -294,47 +376,4 @@ $(function(){
         end_loader()
     })
 })
-
-      $(document).ready(function() {
-        $('#emailButton').click(function() {
-            $('#emailModal').modal('show');
-        });
-
-        $('#emailForm').submit(function(e) {
-            e.preventDefault();
-
-            // Get form data
-            var recipientEmail = $('#recipientEmail').val();
-            var emailSubject = $('#emailSubject').val();
-            var emailBody = $('#emailBody').val();
-
-            // Prepare form data
-            var formData = {
-                recipientEmail: recipientEmail,
-                emailSubject: emailSubject,
-                emailBody: emailBody
-            };
-
-            // Send data via AJAX
-            $.ajax({
-                url: '/sms/admin/purchase_order/send_mail.php',
-                method: 'POST',
-                data: formData,
-                dataType: 'json', // Expect JSON response
-                success: function(response) {
-                    console.log('Response from server:', response); // Log response for debugging
-                    if (response.success) {
-                        alert('Email sent successfully');
-                        $('#emailModal').modal('hide');
-                    } else {
-                        alert('Failed to send email: ' + response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Failed to send email:', error);
-                    alert('Failed to send email. See console for details.');
-                }
-            });
-        });
-      });
     </script>
