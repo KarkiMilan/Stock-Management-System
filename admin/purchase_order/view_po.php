@@ -106,9 +106,6 @@ if($qry->num_rows >0){
 <button class="btn btn-flat btn-success" type="button" id="excel">Excel</button>
 
         <button class="btn btn-flat btn-danger" type="button" id="print">Print</button>
-        
-        
-
         <a class="btn btn-flat btn-primary" href="<?php echo base_url.'/admin?page=purchase_order/manage_po&id='.(isset($id) ? $id : '') ?>">Edit</a>
         <a class="btn btn-flat btn-dark" href="<?php echo base_url.'/admin?page=purchase_order' ?>">Back To List</a>
     </div>
