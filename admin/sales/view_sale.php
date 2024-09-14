@@ -82,11 +82,12 @@ if($qry->num_rows >0){
         </div>
     </div>
     <div class="card-footer py-1 text-center">
-    <button class="btn btn-flat btn-secondary" type="button" id="pdf">PDF</button>
-<button class="btn btn-flat btn-success" type="button" id="excel">Excel</button>
-        <button class="btn btn-flat btn-danger" type="button" id="print">Print</button>
-        <a class="btn btn-flat btn-primary" href="<?php echo base_url.'/admin?page=sales/manage_sale&id='.(isset($id) ? $id : '') ?>">Edit</a>
-        <a class="btn btn-flat btn-dark" href="<?php echo base_url.'/admin?page=sales' ?>">Back To List</a>
+    <button class="btn btn-flat btn-secondary" type="button" id="pdf"><i class="fas fa-file-pdf"></i> PDF</button>
+<button class="btn btn-flat btn-success" type="button" id="excel"> <i class="fas fa-file-excel"></i> Excel</button>
+        <button class="btn btn-flat btn-light" type="button" id="print"> <i class="fas fa-print"></i> Print</button>
+        <a class="btn btn-flat btn-info" href="<?php echo base_url.'/admin?page=sales/manage_sale&id='.(isset($id) ? $id : '') ?>">
+        <i class="fas fa-edit"></i> Edit</a>
+        <a class="btn btn-flat btn-dark" href="<?php echo base_url.'/admin?page=sales' ?>"> <i class="fas fa-list"></i> Back To List</a>
     </div>
 </div>
 <table id="clone_list" class="d-none">

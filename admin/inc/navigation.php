@@ -162,17 +162,9 @@
                     <li class="nav-header">General</li>
                     <li class="nav-item dropdown">
                       <a href="<?php echo base_url ?>admin/?page=General/email" class="nav-link nav-general_email">
-                        <i class="nav-icon fas fa-truck-loading"></i>
+                        <i class="nav-icon fas fa-envelope"></i>
                         <p>
                           Bulk Email
-                        </p>
-                      </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                      <a href="<?php echo base_url ?>admin/?page=General/sms" class="nav-link nav-maintenance_sms">
-                        <i class="nav-icon fas fa-boxes"></i>
-                        <p>
-                          Bulk SMS
                         </p>
                       </a>
                     </li>

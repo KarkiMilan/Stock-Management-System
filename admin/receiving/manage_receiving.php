@@ -218,7 +218,7 @@ if(isset($_GET['bo_id'])){
   });
 </script>
 
-        <a class="btn btn-flat btn-dark" href="<?php echo base_url.'/admin?page=purchase_order' ?>">Cancel</a>
+        <a class="btn btn-flat btn-dark" href="<?php echo base_url.'/admin?page=receiving' ?>">Cancel</a>
     </div>
 </div>
 <script>
