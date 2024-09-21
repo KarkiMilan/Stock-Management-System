@@ -130,11 +130,7 @@ if($qry->num_rows >0){
 <button class="btn btn-flat btn-success" type="button" id="excel">
 <i class="fas fa-file-excel"></i> Excel</button>
 
-        <button class="btn btn-flat btn-light" type="button" id="print"><i class="fas fa-print"></i> Print</button>
-        <a class="btn btn-flat btn-info" href="<?php echo base_url.'/admin?page=receiving/manage_receiving&id='.(isset($id) ? $id : '') ?>">
-        <i class="fas fa-edit"></i> Edit
-        </a>    
-
+        
         <!-- Button to trigger the modal -->
 <button class="btn btn-primary" type="button" id="emailButton" data-bs-toggle="modal" data-bs-target="#emailModal"> <i class="fas fa-envelope"></i>
         Send Email
@@ -171,6 +167,11 @@ if($qry->num_rows >0){
             </div>
         </div>
     </div>
+    <button class="btn btn-flat btn-light" type="button" id="print"><i class="fas fa-print"></i> Print</button>
+        <a class="btn btn-flat btn-info" href="<?php echo base_url.'/admin?page=receiving/manage_receiving&id='.(isset($id) ? $id : '') ?>">
+        <i class="fas fa-edit"></i> Edit
+        </a>    
+
         <a class="btn btn-flat btn-dark" href="<?php echo base_url.'/admin?page=receiving' ?>">
         <i class="fas fa-list"></i> Back To List</a>
     </div>

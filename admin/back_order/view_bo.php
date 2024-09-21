@@ -105,6 +105,43 @@ if($qry->num_rows >0){
     <div class="card-footer py-1 text-center">
     <button class="btn btn-flat btn-secondary" type="button" id="pdf"> <i class="fas fa-file-pdf"></i> PDF</button>
 <button class="btn btn-flat btn-success" type="button" id="excel"> <i class="fas fa-file-excel"></i> Excel</button>
+
+<!-- Button to trigger the modal -->
+<button class="btn btn-primary" type="button" id="emailButton" data-bs-toggle="modal" data-bs-target="#emailModal"> <i class="fas fa-envelope"></i>
+        Send Email
+    </button>
+
+    <!-- Email Modal -->
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Send Test Email</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                <form id="emailForm" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="recipientEmail" class="form-label">Recipient Email</label>
+        <input type="email" class="form-control" id="recipientEmail" name="recipientEmail" required>
+    </div>
+    <div class="mb-3">
+        <label for="emailSubject" class="form-label">Subject</label>
+        <input type="text" class="form-control" id="emailSubject" name="emailSubject" value="Back Order Report" required>
+    </div>
+    <div class="mb-3">
+        <label for="emailBody" class="form-label">Message</label>
+        <textarea class="form-control" id="emailBody" name="emailBody" rows="3" required>Please Find The Attachment For The Back Order Report</textarea>
+    </div>
+    <button type="submit" class="btn btn-white">
+    <i class="fas fa-envelope"></i> Send Email
+</button>
+</form>
+
+                </div>
+            </div>
+        </div>
+    </div>
         <button class="btn btn-flat btn-light" type="button" id="print"><i class="fas fa-print"></i> Print</button>
         <a class="btn btn-flat btn-dark" href="<?php echo base_url.'/admin?page=back_order' ?>"> <i class="fas fa-list"></i> Back To List</a>
     </div>
@@ -258,5 +295,88 @@ $(function(){
         end_loader()
     })
 })
+$(document).ready(function() {
+    $('#emailButton').click(function() {
+        $('#emailModal').modal('show');
+    });
 
+    $('#emailForm').submit(function(e) {
+        e.preventDefault();
+
+        // Start loader (for visual feedback)
+        start_loader();
+
+        // Generate the PDF content
+        var _el = $('<div>');
+        var p = $('#print_out').clone();
+        p.find('tr.text-light').removeClass("text-light bg-navy");
+        _el.append('<div class="d-flex justify-content-center">'+
+                  '<div class="col-1 text-right">'+
+                  '<img src="<?php echo validate_image($_settings->info('logo')) ?>" width="65px" height="65px" />'+
+                  '</div>'+
+                  '<div class="col-10">'+
+                  '<h2 class="text-center"><?php echo $_settings->info('name') ?></h2>'+
+                  '<h3 class="text-center">Back Order Details</h3>'+
+                  '</div>'+
+                  '<div class="col-1 text-right">'+
+                  '</div>'+
+                  '</div><hr/>');
+
+        _el.append(p.html());
+
+        // Ensure the HTML content is correctly available
+        var contentHtml = _el.html();
+        if (!contentHtml) {
+            console.error('No content to generate PDF.');
+            end_loader();
+            return;
+        }
+
+        var opt = {
+            margin: [0.5, 0.5, 0.5, 0.5],
+            filename: 'Back_Order_Detail.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(contentHtml).toPdf().get('pdf').then(function(pdf) {
+            var pdfOutput = pdf.output('blob');
+            var formData = new FormData($('#emailForm')[0]);
+            formData.append('pdf', pdfOutput, 'Back_Order_Detail.pdf');
+
+            // Debugging
+            console.log('FormData content:', ...formData.entries()); // Log FormData content
+
+            // Send data via AJAX
+            $.ajax({
+                url: '/sms/admin/back_order/send_mail.php',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Response from server:', response);
+                    if (response.success) {
+                        alert('Email sent successfully');
+                        $('#emailModal').modal('hide');
+                    } else {
+                        alert('Failed to send email: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to send email:', error);
+                    console.log('Response text:', xhr.responseText); // Log response text
+                    alert('Failed to send email. See console for details.');
+                }
+            }).always(function() {
+                end_loader(); // Stop loader regardless of success or failure
+            });
+        }).catch(function(err) {
+            console.error('Error generating PDF:', err);
+            end_loader(); // Ensure loader stops if there's an error
+        });
+    });
+});
 </script>
