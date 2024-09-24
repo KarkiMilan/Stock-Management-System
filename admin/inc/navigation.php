@@ -87,17 +87,10 @@
                       <a href="<?php echo base_url ?>admin/?page=analyticssales" class="nav-link nav-analyticssales">
                         <i class="nav-icon fas fa-chart-line"></i>
                         <p>
-                          Sales Analytics
+                           Sales Purchase Heat Map
                         </p>
                       </a>
                     </li>
-
-                    <li class="nav-item ">
-                      <a href="<?php echo base_url ?>admin/?page=analyticspurchase" class="nav-link nav-analyticspurchase">
-                        <i class="nav-icon fas fa-chart-line"></i>
-                        <p>
-                         Purchase Analytics
-                        </p>
                       </a>
                     </li>
                     <li class="nav-item ">
