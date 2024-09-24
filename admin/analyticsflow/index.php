@@ -4,7 +4,7 @@
     <canvas id="myChart"></canvas>
 </div>
 <div id="suggestions-container" style="display:none;">
-    <h3>Quantity Flow Suggestions</h3>
+    <h3>Safety Stock Calculation Algorithm Suggestions</h3>
     <ul id="suggestions-list"></ul>
 </div>
 <script>
@@ -86,56 +86,50 @@
     function showSuggestions() {
     // Query the stock and purchase databases
     <?php
+        // Fetch stock data from the database
         $stockResult = $conn->query("SELECT date_created, quantity FROM stock_list");
         $stock_data = array();
         while ($row = $stockResult->fetch_assoc()) {
             $stock_data[] = $row;
         }
 
+        // Fetch purchase data
         $purchaseResult = $conn->query("SELECT item_id, SUM(quantity) as total_quantity FROM po_items GROUP BY item_id");
         $purchase_data = array();
         while ($row = $purchaseResult->fetch_assoc()) {
             $purchase_data[] = $row;
         }
+
+        // Calculate average and standard deviation for safety stock calculation
+        $quantities = array_column($stock_data, 'quantity');
+        $average_demand = array_sum($quantities) / count($quantities);
+        
+        // Calculate standard deviation
+        $squared_diff = array_map(function($q) use ($average_demand) {
+            return pow($q - $average_demand, 2);
+        }, $quantities);
+        $std_deviation = sqrt(array_sum($squared_diff) / count($squared_diff));
+
+        // Assuming a service level of 95% (Z-score of 1.64)
+        $service_level = 1.64;
+        $safety_stock = $service_level * $std_deviation;
     ?>
 
-    // Sort stock data by quantity
-    var sortedStockData = <?php echo json_encode($stock_data); ?>;
-    sortedStockData.sort(function(a, b) {
-        return b.quantity - a.quantity;
-    });
-
-    // Find dates with highest, lowest, and mid-level stock
-    var highestStockDate = sortedStockData[0].date_created;
-    var lowestStockDate = sortedStockData[sortedStockData.length - 1].date_created;
-    var midStockIndex = Math.round(sortedStockData.length / 2);
-    var midStockDate = sortedStockData[midStockIndex].date_created;
-
-    // Generate list of stock suggestions
+    // Safety stock suggestion generation
     var suggestionsList = document.getElementById('suggestions-list');
-    suggestionsList.innerHTML = ''; // clear previous suggestions
+    suggestionsList.innerHTML = ''; // Clear previous suggestions
 
-// Rule-based suggestion generation
-    var listItem1 = document.createElement('li');
-    listItem1.textContent = 'Rule 1 : Consider reducing stock for ' + highestStockDate + ', which has the highest stock of ' + sortedStockData[0].quantity + ' items';
-    suggestionsList.appendChild(listItem1);
+    // Suggestion based on safety stock calculation
+    var safetyStockSuggestion = document.createElement('li');
+    safetyStockSuggestion.textContent = 'Consider maintaining a safety stock level of approximately ' + Math.round(<?php echo $safety_stock; ?>) + ' items based on your current stock levels and demand variability.';
+    suggestionsList.appendChild(safetyStockSuggestion);
 
-    var listItem2 = document.createElement('li');
-    listItem2.textContent = 'Rule 2 : Order more stock for ' + lowestStockDate + ', which has the lowest stock of ' + sortedStockData[sortedStockData.length - 1].quantity + ' items';
-    suggestionsList.appendChild(listItem2);
-
-    var listItem3 = document.createElement('li');
-    listItem3.textContent = 'Rule 3 : Consider restocking ' + midStockDate + ', which has a mid-level stock of ' + sortedStockData[midStockIndex].quantity + ' items';
-    suggestionsList.appendChild(listItem3);
-
-    var sortedPurchaseData = <?php echo json_encode($purchase_data); ?>;
-    sortedPurchaseData.sort(function(a, b) {
-        return b.total_quantity - a.total_quantity;
-    });
-
-    var purchaseSuggestion = document.createElement('li');
-    purchaseSuggestion.textContent = 'Rule 4 : Consider purchasing less of item ' + sortedPurchaseData[0].item_id + ', which has the highest total quantity of ' + sortedPurchaseData[0].total_quantity + ' ordered';
-    suggestionsList.appendChild(purchaseSuggestion);
+    // Additional suggestion for items needing reorder
+    var threshold = <?php echo $safety_stock; ?>; // Reorder threshold based on safety stock
+    var reorderSuggestion = document.createElement('li');
+    reorderSuggestion.textContent = 'If stock falls below ' + threshold + ' items, consider placing an order to replenish stock.';
+    suggestionsList.appendChild(reorderSuggestion);
 }
+
 
 </script>
