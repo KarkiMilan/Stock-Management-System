@@ -5,7 +5,7 @@
 </div>
 
 <div id="suggestions-container" style="display:none;">
-    <h3>Stock Suggestions</h3>
+    <h3>ABC Algorithm Suggestions</h3>
     <ul id="suggestions-list"></ul>
 </div>
 
