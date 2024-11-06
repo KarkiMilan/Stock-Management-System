@@ -61,7 +61,7 @@
                     label: 'Stock Quantity',
                     data: <?php echo $quantities; ?>,
                     fill: false,
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderColor: 'rgba(255, 75, 75, 1)',
                     borderWidth: 2
                 }
             ]
@@ -84,20 +84,20 @@
             },
             legend: {
                 labels: {
-                    fontColor: 'black',
+                    fontColor: 'red',
                     fontSize: 16
                 }
             },
             title: {
                 display: true,
                 text: 'Stock Chart',
-                fontColor: 'black',
+                fontColor: 'red',
                 fontSize: 20
             },
             elements: {
                 point: {
                     radius: 4,
-                    backgroundColor: 'rgba(75, 192, 192, 1)'
+                    backgroundColor: 'rgba(255, 75, 75, 1)'
                 }
             }
         }
